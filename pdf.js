@@ -1,4 +1,4 @@
-/* PDF A4 local, organizado por lugar de entrega. */
+/* PDF A4 local, organizado por lugar de entrega. jsPDF se carga desde la raíz. */
 (() => {
   'use strict';
   const BLUE=[7,90,245], NAVY=[18,46,98], MUTED=[96,119,150], CYAN=[0,145,189];

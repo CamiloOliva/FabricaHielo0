@@ -169,7 +169,12 @@
     if (!order().customers.length) { toast('Agrega al menos un cliente antes de crear el PDF.'); return false; }
     return true;
   }
-  function createPdf() { if (!checkDelivery()) return null; try { return window.IcePdf.create(order()); } catch { toast('No se pudo crear el PDF. Vuelve a abrir la página e inténtalo de nuevo.'); return null; } }
+  function createPdf() {
+    if (!checkDelivery()) return null;
+    if (!window.jspdf?.jsPDF || !window.IcePdf?.create) { toast('El generador de PDF no se cargó. Abre la página con internet y vuelve a intentarlo.'); return null; }
+    try { return window.IcePdf.create(order()); }
+    catch { toast('No se pudo crear el PDF. Tus pedidos siguen guardados; revisa los datos de entrega.'); return null; }
+  }
   function downloadPdf(pdf) { const url = URL.createObjectURL(pdf.blob), link = document.createElement('a'); link.href = url; link.download = pdf.filename; document.body.appendChild(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url),60000); }
   $('download-pdf-button').addEventListener('click',() => { const pdf = createPdf(); if (pdf) { downloadPdf(pdf); toast('PDF preparado. Guárdalo para compartirlo cuando quieras.'); } });
   $('share-pdf-button').addEventListener('click',async () => {
@@ -200,5 +205,10 @@
     catch { storageWarning('No se pudo leer un cambio de otra pestaña. Guarda una copia antes de cerrar.'); }
   });
   openDate(date);
-  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) window.addEventListener('load',() => { navigator.serviceWorker.register('./sw.js').catch(() => storageWarning('El guardado funciona, pero no se pudo preparar el modo sin conexión. Vuelve a abrir la página con internet.')); });
+  $('apply-update').addEventListener('click',() => location.reload());
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    let controlled = Boolean(navigator.serviceWorker.controller);
+    navigator.serviceWorker.addEventListener('controllerchange',() => { if (controlled) $('update-notice').hidden = false; controlled = true; });
+    window.addEventListener('load',() => { navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(() => storageWarning('El guardado funciona, pero no se pudo preparar el modo sin conexión. Vuelve a abrir la página con internet.')); });
+  }
 })();

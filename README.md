@@ -2,7 +2,7 @@
 
 Una aplicación para anotar pedidos durante las llamadas y compartir un PDF claro, organizado por lugar de entrega. La identidad usa azul intenso, celeste, blanco y un icono de montaña inspirado en la referencia de Monte Azul.
 
-HTML, CSS y JavaScript, sin cuenta para el usuario ni pasos de compilación. Incluye jsPDF 4.2.1 en `vendor`, con su licencia MIT. La aplicación no depende de fuentes, imágenes ni bibliotecas alojadas en servicios externos para funcionar.
+HTML, CSS y JavaScript, sin cuenta para el usuario ni pasos de compilación. Incluye jsPDF 4.2.1 junto a los otros archivos, con su licencia MIT. La aplicación no depende de fuentes, imágenes ni bibliotecas alojadas en servicios externos para funcionar.
 
 ## Cómo se usa
 
@@ -21,13 +21,13 @@ En dispositivos que permiten compartir archivos, **Compartir PDF** abre las opci
 
 ## Publicar con GitHub Pages
 
-Repositorio indicado: https://github.com/CamiloOliva/FabricaHielo
+Repositorio publicado: https://github.com/CamiloOliva/FabricaHielo0
 
-1. Sube a la raíz `index.html`, `styles.css`, `core.js`, `pdf.js`, `app.js`, `sw.js`, `manifest.webmanifest`, `.nojekyll` y las carpetas `icons` y `vendor` completas. Puedes incluir `README.md`, `tests` y `scripts`. No subas `.qa`, archivos ZIP ni copias de pedidos.
+1. Descomprime `MonteAzul-publicar.zip` y arrastra todos los archivos extraídos a la raíz del repositorio. Todos van juntos: `index.html`, `styles.css`, `core.js`, `pdf.js`, `app.js`, `sw.js`, `manifest.webmanifest`, `jspdf.umd.min.js`, `jspdf-LICENSE.txt`, `icon.svg`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `.nojekyll`, `.gitignore` y `README.md`. Esta versión no requiere carpetas para los iconos ni para la biblioteca PDF. No subas el ZIP comprimido ni copias de pedidos.
 2. En GitHub, entra a **Settings → Pages**.
 3. En **Source**, elige **Deploy from a branch**.
 4. Selecciona **main → /(root) → Save**.
-5. Cuando termine la publicación, la dirección prevista es **https://camilooliva.github.io/FabricaHielo/**. Esta URL solo funcionará tras publicar; es distinta al enlace del repositorio terminado en `.git`.
+5. Cuando termine la publicación, la dirección prevista es **https://camilooliva.github.io/FabricaHielo0/**. Esta URL solo funcionará tras publicar; es distinta al enlace del repositorio terminado en `.git`.
 
 No se necesita un servidor propio ni instalar paquetes. Documentación: [GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages) y [configurar la publicación](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 
@@ -45,11 +45,11 @@ Descarga una copia JSON desde el pie de página o **Ayuda**. En **Ayuda → Recu
 
 Se mantiene la clave de almacenamiento `mi-hielo-v1` para conservar los datos instalados. El formato actual de las copias es versión 2: cada pedido tiene `destinations`, cada cliente su `destinationId` y no existen preferencias que rellenen próximos pedidos. Las copias válidas de versión 1 se convierten sin perder nombres, cantidades, notas ni entregas anteriores. Solo se limpia la lista original de ejemplo cuando está completamente intacta; también se limpian sus datos de entrega originales si el pedido no tiene información digitada.
 
-Para actualizar, sube los archivos nuevos y cambia `VERSION` en `sw.js`. Cierra todas las ventanas de la aplicación y vuelve a abrir con internet para activar la versión nueva. El historial está separado de los archivos en caché.
+Para actualizar, reemplaza los archivos del repositorio con los del ZIP nuevo. Esta corrección usa caché v5 y rutas al mismo nivel para PDF e iconos. Espera a que GitHub termine de publicar. En el computador recarga con Ctrl+F5; en iPhone cierra todas las ventanas de la aplicación y vuelve a abrir con internet. Las actualizaciones siguientes pueden mostrar el aviso “Actualizar página”; púlsalo para cargar la nueva versión. El historial está separado de los archivos en caché: no hace falta borrar datos de Safari para actualizar.
 
 ## Probar en Windows
 
-Desde esta carpeta:
+En la carpeta de desarrollo, donde están `scripts` y `tests` (no se incluyen en el ZIP de publicación):
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\serve.ps1
@@ -60,3 +60,7 @@ Abre http://127.0.0.1:4173/. El servidor solo escucha en este equipo; se detiene
 Pruebas de lógica: http://127.0.0.1:4173/tests/core.test.html. Pruebas de PDF: http://127.0.0.1:4173/tests/pdf.test.html. Los datos de `tests/fixtures.js` son ficticios y nunca se cargan en la aplicación.
 
 En el iPhone real conviene comprobar el guardado tras cerrar y abrir, compartir y descargar un PDF, recuperar una copia y abrir el pedido en modo avión después de la primera carga.
+
+## Corrección de PDF e iconos
+
+La publicación anterior dejó los recursos sueltos en la raíz, mientras el HTML los buscaba dentro de icons/ y vendor/. Esas rutas devolvían 404. Los archivos principales, el manifiesto y la caché ahora buscan todos los recursos en la raíz. Los iconos incluyen una versión en su URL para renovar las imágenes almacenadas. La biblioteca PDF se sirve desde el propio sitio y permanece disponible sin conexión después de completar la primera carga.

@@ -9,23 +9,24 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Monte Azul">
   <title>Monte Azul · Pedidos de hielo</title>
-  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
-  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg?v=5" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=5">
+  <link rel="manifest" href="./manifest.webmanifest?v=5">
   <link rel="stylesheet" href="./styles.css">
   <script defer src="./core.js"></script>
-  <script defer src="./vendor/jspdf.umd.min.js"></script>
+  <script defer src="./jspdf.umd.min.js"></script>
   <script defer src="./pdf.js"></script>
   <script defer src="./app.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#delivery-section">Ir al pedido</a>
   <header class="topbar">
-    <a class="brand" href="./" aria-label="Monte Azul, inicio"><img src="./icons/icon.svg" width="50" height="50" alt=""><span>MONTE AZUL<small>AGUA · HIELO · FRESCURA</small></span></a>
+    <a class="brand" href="./" aria-label="Monte Azul, inicio"><img src="./icon.svg?v=5" width="50" height="50" alt=""><span>MONTE AZUL<small>AGUA · HIELO · FRESCURA</small></span></a>
     <div class="header-actions"><span class="workspace-label">Tu espacio de pedidos</span><button id="history-button" class="button header-button" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 11a9 9 0 1 1 2.5 7M3 4v7h7M12 7v5l3 2"/></svg><span>Historial</span></button><button class="help-button" id="help-button" type="button" aria-label="Ayuda">?</button></div>
   </header>
   <main class="page">
     <div id="storage-warning" class="notice warning" role="alert" hidden></div>
+    <div id="update-notice" class="notice" role="status" hidden>Hay una versión nueva lista para usar. <button id="apply-update" class="text-button" type="button">Actualizar página</button></div>
     <div id="day-notice" class="notice" hidden>Ya es un nuevo día. <button id="open-today" class="text-button" type="button">Abrir el pedido de hoy</button></div>
     <section class="hero" aria-labelledby="page-title">
       <div class="hero-copy"><p class="eyebrow"><span class="live-dot" aria-hidden="true"></span> UN NUEVO DÍA. TODO BAJO CONTROL.</p><h1 id="page-title">De la llamada<br>al pedido <span>perfecto.</span></h1><p>Anota lo que te piden.<br>Las cuentas y el PDF van por nuestra cuenta.</p><span class="hero-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg> Hecho para que tu día sea más fácil.</span></div>
@@ -40,7 +41,7 @@
       </div>
       <aside class="summary-column" id="summary-section" aria-labelledby="summary-heading"><section class="summary-card"><div class="summary-header"><span class="summary-kicker">TODO SUMADO, TODO CLARO</span><span class="summary-symbol" aria-hidden="true">✳</span><h2 id="summary-heading">El total de hoy</h2><p>Las cuentas se actualizan al instante.</p></div><div class="summary-content"><div class="totals" aria-live="polite" aria-atomic="true"><div><span class="unit-label"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10l-2 5c5 3 6 7 4 11-1 2-13 2-14 0-2-4-1-8 4-11Z"/><path d="M9 8h6"/></svg> Bultos</span><strong id="total-bultos">0</strong></div><div><span class="unit-label"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14l-1 15H6Zm3 0V4a4 4 0 0 1 8 0v2"/></svg> Bolsas</span><strong id="total-bolsas">0</strong></div></div><div id="destination-totals" class="destination-totals"></div><div class="progress-top"><span id="progress-label"></span><span id="progress-fraction"></span></div><progress id="progress" max="1" value="0" aria-label="Clientes revisados"></progress><p class="pending-hint" id="pending-hint"></p><div class="summary-divider"></div><div class="document-heading"><span class="pdf-icon" aria-hidden="true">PDF</span><div><h3>El pedido, listo para enviar.</h3><p>Un archivo claro, todas las entregas.</p></div></div><details class="preview-details"><summary>Revisar el contenido del PDF <span aria-hidden="true">⌄</span></summary><div id="pdf-preview" class="pdf-preview" tabindex="0" role="region" aria-label="Resumen del contenido del PDF"></div></details><button class="button primary wide" id="share-pdf-button" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg> Compartir PDF</button><button class="button secondary wide" id="download-pdf-button" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 17v4h14v-4"/></svg> Descargar PDF</button><p class="share-caption">Guárdalo o envíalo a quien lo necesite.</p></div></section><p class="reassurance"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 3 7v6c0 5 9 9 9 9s9-4 9-9V7ZM8 12l3 3 5-6"/></svg> Tus pedidos se guardan en este dispositivo.</p></aside>
     </div>
-    <footer><div class="footer-brand"><img src="./icons/icon.svg" width="30" height="30" alt=""><span>MONTE AZUL <small>Frescura que acompaña tu día.</small></span></div><button id="backup-button" type="button" class="text-button">Guardar copia de seguridad <span aria-hidden="true">↗</span></button></footer>
+    <footer><div class="footer-brand"><img src="./icon.svg?v=5" width="30" height="30" alt=""><span>MONTE AZUL <small>Frescura que acompaña tu día.</small></span></div><button id="backup-button" type="button" class="text-button">Guardar copia de seguridad <span aria-hidden="true">↗</span></button></footer>
   </main>
   <nav class="mobile-dock" aria-label="Resumen y PDF"><div><strong id="dock-total">0 bultos · 0 bolsas</strong><span id="dock-pending">Agrega el primer cliente</span></div><button id="review-button" type="button" class="button primary">Agregar cliente <span aria-hidden="true">＋</span></button></nav>
   <dialog id="app-dialog"><div class="dialog-header"><h2 id="dialog-title"></h2><button id="close-dialog" class="icon-button" aria-label="Cerrar ventana" type="button">×</button></div><div id="dialog-content"></div></dialog>
