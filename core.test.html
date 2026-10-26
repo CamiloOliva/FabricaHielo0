@@ -1,0 +1,38 @@
+<!doctype html><html lang="es"><meta charset="utf-8"><title>Pruebas de pedidos · Monte Azul</title><script src="../core.js"></script><script src="./fixtures.js"></script><body><h1>Pruebas de pedidos</h1><pre id="results"></pre><script>
+const C=IceCore,results=[],check=(name,value)=>{if(!value)throw new Error(name);results.push('✓ '+name)};
+try{
+ const empty=C.createOrder('2026-09-26');
+ check('Cada pedido empieza sin clientes, lugares escritos, placa ni conductor',!empty.customers.length&&empty.destinations.length===1&&!empty.destinations[0].name&&!empty.driver&&!empty.vehicle);
+ const order=IceFixtures.order(),db={version:2,orders:{[order.date]:order}};
+ check('Totales generales: 51 bultos y 90 bolsas',C.totals(order).bultos===51&&C.totals(order).bolsas===90);
+ const groups=C.groupByDestination(order);
+ check('Agrupa clientes por su lugar de entrega',groups.length===2&&groups[0].customers.length===2&&groups[1].customers[0].name==='Marta');
+ check('Subtotal norte: 35 bultos y 20 bolsas',groups[0].totals.bultos===35&&groups[0].totals.bolsas===20);
+ check('Subtotal sur: 16 bultos y 70 bolsas',groups[1].totals.bultos===16&&groups[1].totals.bolsas===70);
+ check('La nota de viajes no afecta las cantidades',C.totals(order).bultos===51);
+ check('Un nuevo día ignora todos los datos del anterior',JSON.stringify(C.createOrder('2026-09-27',order))===JSON.stringify({...empty,date:'2026-09-27'}));
+ check('Fecha en español correcta',C.longDate(order.date)==='sábado 26 de septiembre de 2026');
+ check('Validación de fechas y años bisiestos',!C.validDate('2026-02-29')&&!C.validDate('2026-13-01')&&C.validDate('2028-02-29'));
+ check('Se usa la fecha local',C.today(new Date(2026,8,26,23,59))==='2026-09-26');
+ check('Se rechazan cantidades negativas, fraccionarias y excesivas',[-1,.5,100000,NaN,Infinity,'a'].every(n=>C.quantity(n)===null)&&[0,1,99999].every(n=>C.quantity(n)!==null));
+ check('La copia conserva lugares, clientes y asignaciones',JSON.stringify(C.validateDatabase(structuredClone(db)))===JSON.stringify(db));
+ const unassigned=structuredClone(order);unassigned.customers[0].destinationId='';
+ check('Los clientes sin lugar aparecen en un grupo separado',C.groupByDestination(unassigned).at(-1).name==='Sin lugar asignado'&&C.groupByDestination(unassigned).at(-1).totals.bultos===5);
+ const legacy={version:1,preferences:{destination:'Lugar anterior',vehicle:'XYZ 456',driver:'Conductor anterior',customers:[]},orders:{'2026-09-25':{date:'2026-09-25',destination:'Lugar anterior',vehicle:'XYZ 456',driver:'Conductor anterior',customers:[{id:'old',name:'Cliente anterior',bultos:7,bolsas:2,note:'No borrar',status:'ordered'}]}}};
+ const migrated=C.validateDatabase(legacy),old=migrated.orders['2026-09-25'];
+ check('Migra copias antiguas sin perder clientes ni cantidades',migrated.version===2&&old.customers[0].bultos===7&&old.customers[0].note==='No borrar');
+ check('Migra el lugar antiguo y lo asigna a sus clientes',old.destinations[0].name==='Lugar anterior'&&old.customers[0].destinationId===old.destinations[0].id);
+ check('No migra preferencias como datos de próximos días',!('preferences'in migrated)&&!C.createOrder('2026-09-28',legacy.preferences).driver);
+ const names=['Yazmin','Fernando','Concho','Dario','Zaira ardila','Edwin','Hermes','Heriberto','Maritza'];
+ legacy.orders['2026-09-25'].customers=names.map((name,i)=>({id:'client-'+(i+1),name,bultos:0,bolsas:0,note:'',status:'pending'}));
+ check('Elimina únicamente la plantilla original intacta',C.validateDatabase(legacy).orders['2026-09-25'].customers.length===0);
+ legacy.orders['2026-09-25'].customers[0].note='Volver a llamar';
+ check('Conserva la plantilla si ya se digitó información',C.validateDatabase(legacy).orders['2026-09-25'].customers[0].note==='Volver a llamar');
+ const sampleOnly=structuredClone(legacy);Object.assign(sampleOnly.orders['2026-09-25'],{destination:'centro abastos',vehicle:'CCK 379',driver:'Yunior',customers:[]});const cleaned=C.validateDatabase(sampleOnly).orders['2026-09-25'];
+ check('Limpia datos de entrega del ejemplo original en pedidos vacíos',!cleaned.destinations[0].name&&!cleaned.vehicle&&!cleaned.driver);
+ const corruptions=[d=>d.version=3,d=>d.orders[order.date].date='2026-09-27',d=>d.orders[order.date].customers[0].bultos=-1,d=>d.orders[order.date].customers[0].bolsas=.5,d=>d.orders[order.date].customers[0].status='none',d=>d.orders[order.date].customers[1].id='rosa',d=>d.orders[order.date].destinations[1].id='north',d=>d.orders[order.date].customers[0].destinationId='missing',d=>d.orders[order.date].destinations=[],d=>d.orders[order.date].destinations=Array.from({length:21},(_,i)=>({id:String(i),name:'Lugar'}))];
+ corruptions.forEach((mutate,i)=>{const invalid=structuredClone(db);mutate(invalid);let rejected=false;try{C.validateDatabase(invalid)}catch{rejected=true}check('Rechaza copia dañada '+(i+1),rejected)});
+ document.body.dataset.status='passed';
+}catch(error){results.push('FALLO: '+error.message);document.body.dataset.status='failed'}
+document.getElementById('results').textContent=results.join('\n')+'\n'+results.filter(r=>r.startsWith('✓')).length+' pruebas aprobadas.';
+</script></body></html>

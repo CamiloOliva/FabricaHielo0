@@ -1,0 +1,5 @@
+.tools/
+.qa/
+*.zip
+mi-hielo-copia-*.json
+monte-azul-copia-*.json

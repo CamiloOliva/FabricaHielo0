@@ -1,0 +1,20 @@
+<!doctype html><html lang="es"><meta charset="utf-8"><title>Pruebas PDF · Monte Azul</title><script src="../core.js"></script><script src="./fixtures.js"></script><script src="../vendor/jspdf.umd.min.js"></script><script src="../pdf.js"></script><body><h1>Pruebas de PDF</h1><pre id="results"></pre><script>
+(async()=>{
+ const results=[],check=(name,value)=>{if(!value)throw new Error(name);results.push('✓ '+name)};
+ try{
+  const order=IceFixtures.order(),original=JSON.stringify(order),pdf=IcePdf.create(order);
+  check('Genera un PDF real',pdf.blob.type==='application/pdf'&&(await pdf.blob.text()).startsWith('%PDF-'));
+  check('El nombre incluye la fecha',pdf.filename==='pedido-hielo-2026-09-26.pdf');
+  check('Tres clientes y dos lugares caben en una página',pdf.pageCount===1);
+  check('El PDF no modifica el pedido',JSON.stringify(order)===original);
+  const large=structuredClone(order);large.destinations=Array.from({length:20},(_,i)=>({id:'p'+i,name:'Lugar de entrega '+i+' con nombre largo para comprobar los saltos de página'}));
+  large.customers=Array.from({length:200},(_,i)=>({id:'c'+i,name:('José María Muñoz Álvarez '+i+' ').repeat(2).slice(0,60),bultos:99999,bolsas:99999,note:'Entrega temprano. Confirmar llegada del vehículo y conductor. '.repeat(4).slice(0,240),status:'ordered',destinationId:'p'+(i%20)}));
+  check('200 clientes en 20 lugares generan varias páginas',IcePdf.create(large).pageCount>1);
+  check('Mantiene totales de pedidos grandes',IceCore.totals(large).bultos===19999800);
+  for(const [label,mutate]of[['cliente sin lugar',o=>o.customers[0].destinationId=''],['lugar vacío',o=>o.destinations[0].name=''],['conductor vacío',o=>o.driver=''],['vehículo vacío',o=>o.vehicle=''],['lugares repetidos',o=>o.destinations[1].name=o.destinations[0].name],['sin clientes',o=>o.customers=[]]]){const invalid=structuredClone(order);mutate(invalid);let rejected=false;try{IcePdf.create(invalid)}catch{rejected=true}check('No exporta '+label,rejected)}
+  const pending=structuredClone(order);pending.customers[0].bultos=0;pending.customers[0].status='pending';check('Admite clientes pendientes y muestra su estado',IcePdf.create(pending).blob.size>1000);
+  document.body.dataset.status='passed';
+ }catch(error){results.push('FALLO: '+error.message);document.body.dataset.status='failed'}
+ document.getElementById('results').textContent=results.join('\n')+'\n'+results.filter(r=>r.startsWith('✓')).length+' pruebas aprobadas.';
+})();
+</script></body></html>
